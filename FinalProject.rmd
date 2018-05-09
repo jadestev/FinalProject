@@ -1,0 +1,173 @@
+---
+title: 'DSO: 545 Statistical Computing and Data Visualization'
+author: 'Team 8: Jade Stevens, Mario Guerrero, Dani Cheng'
+date: "Spring 2018"
+header-includes:
+   - \usepackage{color}
+output: word_document
+---
+\begin{center} 
+{\color{red} \textbf{Doc6}}
+\end{center}
+
+## Executive Summary 
+
+It has been known for many years that obesity, both in adults and children, has been on the rise and become a major epidemic in our country. There are many causes that contribute to this nationwide problem. Higher poverty rates, dual income households (both parents work full-time), low income per capita, technology replacing exercise in children, and the increase of social media availability are just some of the sources that contribute to this societal issue.
+
+For our project, we would like to see if there is a correlation between the number of fast food restaurants and the cities that have been designated as having a high percentage of obese individuals. We would like create a heat map for the purpose of observing whether obesity occurs within areas that are saturated with a high number of fast food restaurants.
+
+``` {r setup }
+```
+
+## Introduction 
+
+Obesity in the United States has been increasingly cited as a major health issue in recent decades, resulting in diseases such as coronary heart disease that lead to mortality.  While many industrialized countries have experienced similar increases, obesity rates in the United States are the highest in the world. 
+
+Obesity has continued to grow within the United States. Two of every three American men are considered to be overweight or obese, but the rates for women are far higher. The United States contains one of the highest percentage of obese people in the world. An obese person in America incurs an average of $1,429 more in medical expenses annually. Approximately $147 billion is spent in added medical expenses per year within the United States.  This number is suspected to increase approximately $1.24 billion per year until the year 2030.
+
+Obesity has been cited as a contributing factor to approximately 100,000–400,000 deaths in the United States per year and has increased health care use and expenditures, costing society an estimated $117 billion in direct (preventive, diagnostic, and treatment services related to weight) and indirect (absenteeism, loss of future earnings due to premature death) costs. This exceeds health care costs associated with smoking and accounts for 6% to 12% of national health care expenditures in the United States.
+
+Fast food has been cited as a contributing factor to obesity in the United States by various sources over the years. Around one third of children aged 4 to 19 eat fast food every day in the U.S.
+
+Many popular American foods, including hamburgers, french fries, bacon, and doughnuts, are high in fat and carbohydrate content. These food items are also relatively inexpensive and available at fast food chains across the country (for ex. value menu). These convenience foods are frequently fried and are high in calories. Consumption of foods exceedingly high in fat calories can lead to obesity. Many menu items at fast food establishments do not fulfill basic nutritional requirements of a healthy meal.
+
+Fast food chains and restaurants have experienced improved sales with larger portion sizes.  Research cited by the Center for Disease Control estimates restaurant meal sizes to be four times larger than they were in the 1950s.
+
+There are four basic reasons why fast food is linked to obesity:
+
+* First, unhealthy ingredients. Most of the fast food contains a large amount of sugar, fats and carbs and less minerals and vitamins. This means that you are taking in large amount of unhealthy calories in the shape of fast food which leads to weight gain and ultimately obesity. Most of the fast foods have exceeding levels of sugar and fats which are directly associated with increasing weight.
+
+* Second, larger portions. The unhealthy ingredients of the fast food are further aggravated with increased portion sizes which have grown parallel with the average body weight of a person from the 70s to date. While the portions have become large, the person will still eat the complete meal regardless of feeling full or not. This means that people are eating bigger portions of junk food leading to abnormal weight gain.
+
+* Third, lower cost.  One of the main reasons people cannot stop eating fast food is the low costs it is available in. As per a research conducted by the University of Washington, a diet containing 2000 calories of fast food costs much less than a diet with 2000 calories of healthy food. This makes it more affordable than going for healthy food and is a leading cause of obesity in lower-income classes.
+
+* Fourth, convenience.  Fast food restaurants offer convenience. You can always find one in close proximity of your home and can also get food easily delivered to your house. This makes it a convenient option than making food at home using healthier ingredients.
+
+According to studies, the consumption of fast food has increased over the past four decades at an alarming rate. This increased calorie intake is a leading cause of obesity in the USA. If it is not controlled, health issues are going to rise in the coming years as more people will become obese eating unhealthy fast food.
+
+
+```{r}
+```
+
+## Data Description
+
+To determine what the best approach would be we wanted to find public data that could show us where all fast food resaturants are located in United States.
+
+### BMI Variables
+
+
+|**Variable**                     |**Description**
+----------------------------------|-------------------------------------------------------
+|**Year**                        |Year|
+|**Location**                     |State Location|
+|**BMI**                        |Body Mass Index (BMI)|
+|**Lon**                   |Longitude Coordinates|
+|**Lat**                   |Latitude Coordinates|
+
+
+### Fastfood Restaurant Variables
+
+|**Variable**                     |**Description**
+----------------------------------|-------------------------------------------------------
+|**State**                        |State|
+|**Name**                     |Fast Food Restaurant Name|
+|**Postal Code**                  |Zipcode|
+
+
+
+
+## Data Cleaning
+
+``` {r}
+```
+
+## Exploratory Data Analysis:
+We first wanted to see how the data looked for each data set as a stand alone. 
+``` {r, echo = FALSE, message = FALSE, warning = FALSE}
+library(dplyr)
+library(ggplot2)
+library(mapproj)
+library(mapproj)
+library(ggmap)
+library(fiftystater)
+library(tidyr)
+
+obese_map = read.csv("scrub_obese.csv")
+
+```
+### Average BMI Across the State
+
+``` {r}
+new_obese = obese_map %>%
+  separate(col = Locator, 
+           into = c("lon", "lat"),
+           sep="," ,
+           remove = T)
+
+new_obese$LocationDesc = tolower(new_obese$LocationDesc)
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height=4}
+
+j <- ggplot(new_obese, aes(map_id = LocationDesc)) + 
+  geom_map(aes(fill = BMI), map = fifty_states) + 
+  expand_limits(x = fifty_states$long, y = fifty_states$lat) +
+  coord_map() +
+  scale_x_continuous(breaks = NULL) + 
+  scale_y_continuous(breaks = NULL) +
+  scale_fill_gradient(low = "gray",
+                      high = "darkblue") +
+  labs(x = "", y = "") +
+  theme(legend.position = "bottom", 
+        panel.background = element_blank()) +
+  ggtitle("Percentage of Obese Population in Each State")
+
+j + fifty_states_inset_boxes() 
+```
+```{r}
+fastfood_map = read.csv("fastfoodtest.csv")
+obese_map = read.csv("scrub_obese_test.csv")
+obese_map$LocationDesc = tolower(obese_map$LocationDesc)
+fastfood_map$state = tolower(fastfood_map$state)
+
+test_map = full_join(fastfood_map, obese_map, 
+                     by = c("state"= "LocationDesc"))
+usa_center = as.numeric(geocode("United States"))
+USAMap = ggmap(get_googlemap(center=usa_center, 
+                             scale=2, 
+                             zoom=4)) 
+USAMap +
+  geom_point(aes(x=lon, y=lat), 
+           data=test_map) +
+  scale_fill_gradient(low = "white",
+                      high = "darkblue") +
+  ggtitle("Location of Restaurants") 
+```
+
+## Dashboard
+
+
+``` {r, echo = FALSE, message = FALSE, warning = FALSE, fig.height=4 }
+USAMap +
+  geom_point(aes(x=lon, y=lat, colour=BMI), 
+           data=test_map) +
+  scale_fill_gradient(low = "white",
+                      high = "darkblue") +
+  ggtitle("Pop of Obese Crossed by Restaurants")
+```
+
+### Conclusion
+```{r}
+
+```
+
+Based on our analysis of the data provided, we can see that there is indeed somewhat of a correlation between the number of fast food restaurants in a community and percentage of indviduals that are considered obese in that area. Proximity and low-cost food items make fast food restaurants a convenient choice for adults, when the alternative of a grocery store may not be as close. It would be interesting to also map the location of grocery stores in each community to see if that my also be a contributing factor to BMI.
+
+It should of course be noted that there other factors that go into an individual's BMI. Considering external factors only, we know that income, education, transportation are just a few of the factors that play a part in influencing an individual's behavior towards health and food choices. 
+
+Furthermore, we should not be fully reliant on just the number of of fast food restaurants as being the sole contributors to an indviduals. We should also consider the type of restaurant and their menu items. 
+
+
+Lastly, as mentioned earlier this dataset does not fully represent all fast food restaurants in the country. The map is clearly lacking fast food restaurants located from the MidWest to the West Coast. 
+
+In order for this analysis to be fully conclusive, we would need all of these concerns addressed so that we can give the best representative. Looking towards the future, we look forward to gathering additional data points and doing an even more deep analysis of the information to determine if there is indeed a true relationship between the number of restaurants and a communities average BMI.
